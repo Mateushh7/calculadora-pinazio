@@ -1,0 +1,309 @@
+        /* *** NOVAS VARIÁVEIS DE COR DA EMPRESA *** */
+        :root {
+            --cor-primaria: #3a5a6b; /* Azul Petróleo Escuro */
+            --cor-secundaria: #88c6db; /* Azul Claro (Aproximado) */
+            --cor-acento: #9a463e; /* Vermelho Amarronzado */
+            --cor-acao-secundaria: #4a90e2; /* Azul Botão Adicionar */
+            --cor-fundo-pagina: #e2e8f0; /* *** NOVO: Fundo da página (Slate 200) *** */
+            --cor-fundo-card: #ffffff; /* Branco */
+            --cor-fundo-claro: #f8fafc; /* Cinza muito claro (preview bg) */
+            --cor-fundo-medio: #e2f0ff; /* Azul bem claro (lista pedido) */
+            --cor-texto-padrao: #334155; /* Slate 700 */
+            --cor-texto-label: var(--cor-primaria);
+            --cor-borda-padrao: #cbd5e1; /* Slate 300 */
+            --cor-borda-input: #889ca4; /* Cinza Azulado */
+            /* *** NOVO: Cor de acento mais escura para hover *** */
+            --cor-acento-hover: #7d3a33;
+        }
+
+        /* Estilos gerais */
+        body {
+            background-color: var(--cor-fundo-pagina); /* *** FUNDO ALTERADO *** */
+            font-family: sans-serif; /* Fonte padrão */
+            color: var(--cor-texto-padrao); /* Define cor de texto padrão */
+        }
+        .container {
+            padding-bottom: 4rem;
+        }
+        /* Títulos principais e de seção */
+        h1, h2, h3 {
+            color: var(--cor-primaria);
+        }
+        /* Labels */
+        label {
+            color: var(--cor-texto-label);
+        }
+        /* Inputs */
+        input[type=number], input[type=text] {
+            border-color: var(--cor-borda-input);
+            color: var(--cor-texto-padrao); /* Garante cor do texto no input */
+        }
+        input:focus { /* Estilo de foco */
+            --tw-ring-color: var(--cor-secundaria); /* Usa cor secundária para o anel de foco */
+            border-color: var(--cor-secundaria);
+        }
+        /* Botões */
+        button {
+            transition: opacity 0.2s ease-in-out;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #calculateButton {
+            background-color: var(--cor-acento);
+            border-color: var(--cor-acento);
+            --tw-ring-color: var(--cor-acento);
+        }
+        #addPieceButton {
+            background-color: var(--cor-acao-secundaria);
+            border-color: var(--cor-acao-secundaria);
+            --tw-ring-color: var(--cor-acao-secundaria);
+        }
+        #downloadImageButton {
+            background-color: #16a34a; /* Verde */
+            border-color: #16a34a;
+            --tw-ring-color: #16a34a;
+        }
+        #downloadImageButton:hover {
+             background-color: #15803d;
+        }
+        /* *** NOVO: Botão Download PDF *** */
+        #downloadPdfButton {
+            background-color: #6366f1; /* Indigo */
+            border-color: #6366f1;
+            --tw-ring-color: #6366f1;
+        }
+        #downloadPdfButton:hover {
+             background-color: #4f46e5;
+        }
+
+        .delete-button {
+            /* *** COR ALTERADA *** */
+            background-color: var(--cor-acento);
+            border-color: var(--cor-acento);
+            --tw-ring-color: var(--cor-acento);
+        }
+        .delete-button:hover {
+             /* *** COR HOVER ALTERADA *** */
+            background-color: var(--cor-acento-hover);
+            opacity: 1; /* Garante opacidade total no hover */
+       }
+
+        /* Checkbox */
+        #specifySegments {
+            color: var(--cor-acento); /* Usa a cor de acento para o check */
+            border-color: var(--cor-borda-input);
+        }
+        #specifySegments:focus {
+             --tw-ring-color: var(--cor-acento);
+             border-color: var(--cor-acento);
+        }
+
+        /* Seções em cards */
+        .card {
+            background-color: var(--cor-fundo-card); /* *** FUNDO ALTERADO PARA BRANCO *** */
+            padding: 1.5rem; /* px-6 py-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* shadow */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+
+        /* Estilos do Preview Principal */
+        .preview-section { /* Container para Preview + Ambiente */
+             position: relative;
+             padding-top: 1rem; /* Adiciona espaço no topo para o título/ambiente */
+        }
+        #previewTitleAmbiente {
+            /* Estilos transferidos do h2 e ajustados */
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem; /* mb-2 */
+            text-align: center;
+            color: var(--cor-primaria);
+            min-height: 2rem; /* Garante altura mínima para evitar saltos */
+        }
+
+        .preview {
+            margin-top: 0; /* Removida margem, título agora está fora */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 320px;
+            background-color: var(--cor-fundo-claro);
+            border-radius: 0.375rem;
+            padding: 2.5rem; /* Espaço para cotas */
+            border: 1px solid var(--cor-borda-padrao);
+            overflow: visible; /* Permite cotas fora */
+            position: relative;
+        }
+        .peca { /* Peça no preview principal */
+            position: relative;
+            background-color: var(--cor-secundaria); /* Cor secundária para a peça */
+            opacity: 0.7; /* Leve transparência */
+            border: 2px solid var(--cor-primaria); /* Borda com cor primária */
+            box-sizing: border-box;
+            overflow: hidden; /* Esconde partes internas que vazam */
+        }
+
+        /* Elementos internos do preview */
+        .divisao-segmento {
+            background-color: rgba(255, 255, 255, 0.2); /* Fundo mais claro e transparente */
+            box-sizing: border-box; position: absolute;
+        }
+        .divisao-pinazio-peca {
+            background-color: #ffffff; border: 1px solid var(--cor-borda-input);
+            box-sizing: border-box; position: absolute;
+        }
+        .pinazio-horizontal-peca { z-index: 1; }
+        .pinazio-vertical-peca { z-index: 2; }
+        .conector-visual {
+            position: absolute; z-index: 3; display: flex; justify-content: center;
+            align-items: center; overflow: hidden;
+        }
+        .conector-visual::before, .conector-visual::after {
+            content: ''; position: absolute; background-color: var(--cor-borda-input);
+        }
+        .conector-visual::before { width: 100%; height: 2px; transform: rotate(45deg); }
+        .conector-visual::after { width: 100%; height: 2px; transform: rotate(-45deg); }
+
+        /* Cotas */
+        .dimension-label {
+            position: absolute; font-weight: 600; color: var(--cor-primaria);
+            font-size: 10px; background-color: rgba(255, 255, 255, 0);
+            padding: 1px 4px; border-radius: 2px; z-index: 10;
+            pointer-events: none; white-space: nowrap;
+        }
+        .total-dimension-label { font-size: 12px; font-weight: bold; }
+        .segment-label-horizontal { transform: translateX(-50%); text-align: center; }
+        .segment-label-vertical { transform-origin: center center; }
+        .preview-error-message {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: #e53e3e; text-align: center; padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9); border-radius: 5px;
+            z-index: 5; pointer-events: none;
+        }
+
+        /* Inputs Dinâmicos */
+        #segmentInputContainer {
+            margin-top: 1.5rem; padding: 1rem; background-color: #e2e8f0; /* Slate 200 */
+            border-radius: 0.375rem; border: 1px dashed var(--cor-borda-padrao); display: none;
+        }
+        .dynamic-input-group { margin-bottom: 1rem; }
+        .dynamic-input-group label {
+            display: block; font-size: 0.875rem; font-weight: 500;
+            color: var(--cor-texto-padrao); margin-bottom: 0.5rem;
+        }
+        .dynamic-inputs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+         .dynamic-inputs input[type="number"] {
+            width: 80px; padding: 0.25rem 0.5rem; font-size: 0.875rem;
+            text-align: center; border: 1px solid var(--cor-borda-padrao);
+            border-radius: 0.25rem;
+       }
+        .segment-input-warning {
+            color: #e53e3e; text-align: center; font-size: 0.875rem; margin-top: 0.5rem; display: block;
+        }
+
+        /* Container Principal de Resultados/Preview */
+        #captureContainer { display: none; }
+
+        /* Tabela de Resultados */
+        .results-table {
+            width: 100%; border-collapse: collapse; margin-top: 0.5rem;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid var(--cor-borda-padrao); padding: 0.5rem; text-align: left;
+            font-size: 0.875rem;
+        }
+        .results-table th { background-color: #e2e8f0; /* Slate 200 */ font-weight: bold; }
+
+        /* Lista de Peças do Pedido */
+        .pedido-pecas-list {
+            margin-top: 1.5rem; padding: 1rem; background-color: var(--cor-fundo-medio);
+            border-radius: 0.375rem; border: 1px solid var(--cor-secundaria);
+        }
+        #pedidoHeader {
+            font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: var(--cor-primaria);
+        }
+        .pedido-peca-item {
+            background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda-padrao); border-radius: 0.25rem;
+            padding: 1rem; margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+            overflow-x: auto; /* Permite scroll horizontal se necessário */
+            padding-right: 1rem; /* Espaço para scrollbar não cobrir conteúdo */
+        }
+        .peca-item-details {
+            min-width: 0; /* Permite encolher */
+        }
+        .peca-item-details h4 {
+            font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cor-primaria);
+        }
+        .peca-item-details .results-table {
+           margin-top: 0.5rem; max-width: 300px;
+        }
+        .peca-item-details .results-table th,
+        .peca-item-details .results-table td {
+            padding: 0.25rem 0.4rem; font-size: 0.8rem;
+        }
+
+        /* Mini-Preview na Lista */
+        .mini-preview-container {
+            flex-shrink: 0; /* Não encolhe */
+            width: 300px; height: 300px; padding: 30px;
+            border: 1px solid var(--cor-borda-padrao); border-radius: 0.25rem;
+            background-color: var(--cor-fundo-claro);
+            position: relative; display: flex;
+            justify-content: center; align-items: center; overflow: visible;
+            margin-left: 500px; /* Distância fixa da tabela */
+        }
+        .mini-preview-container .peca {
+           border-width: 1px; background-color: var(--cor-secundaria); opacity: 0.7; border-color: var(--cor-primaria);
+        }
+        .mini-preview-container .dimension-label {
+           font-size: 9px; padding: 1px 3px; background-color: rgba(255, 255, 255, 0); color: var(--cor-primaria);
+        }
+        .mini-preview-container .total-dimension-label { font-size: 10px; }
+        .mini-preview-container .conector-visual::before,
+        .mini-preview-container .conector-visual::after { height: 1px; background-color: var(--cor-borda-input); }
+        .mini-preview-container .divisao-pinazio-peca { border-width: 0.5px; border-color: var(--cor-borda-input); }
+
+        /* Botão Excluir */
+        .delete-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            color: white; border: none; border-radius: 0.25rem; padding: 0.25rem 0.5rem;
+            font-size: 0.75rem; font-weight: 500; cursor: pointer;
+            z-index: 15; /* Acima das cotas */
+        }
+
+        /* Remove setas do input number */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+        /* Estilos para impressão do PDF */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #pedidoPecasListContainer, #pedidoPecasListContainer * {
+                visibility: visible;
+            }
+            #pedidoPecasListContainer {
+                position: absolute; left: 0; top: 0; width: 100%;
+                margin: 0; padding: 10mm; box-shadow: none; border: none; background-color: white;
+            }
+             .pedido-peca-item {
+                page-break-inside: avoid; border: 1px solid #ccc; overflow: visible;
+             }
+             .delete-button {
+                 display: none;
+             }
+             .mini-preview-container {
+                 page-break-inside: avoid;
+             }
+             h3 {
+                 visibility: visible;
+             }
+        }
