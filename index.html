@@ -162,7 +162,8 @@
             box-sizing: border-box; position: absolute;
         }
         .divisao-pinazio-peca {
-            background-color: #ffffff; border: 1px solid var(--cor-borda-input);
+            background-color: var(--pinazio-color, #ffffff);
+            border: 1px solid var(--pinazio-color, var(--cor-borda-input));
             box-sizing: border-box; position: absolute;
         }
         .pinazio-horizontal-peca { z-index: 1; }
@@ -172,7 +173,7 @@
             align-items: center; overflow: hidden;
         }
         .conector-visual::before, .conector-visual::after {
-            content: ''; position: absolute; background-color: var(--cor-borda-input);
+            content: ''; position: absolute; background-color: var(--pinazio-color, var(--cor-borda-input));
         }
         .conector-visual::before { width: 100%; height: 2px; transform: rotate(45deg); }
         .conector-visual::after { width: 100%; height: 2px; transform: rotate(-45deg); }
@@ -276,8 +277,8 @@
         }
         .mini-preview-container .total-dimension-label { font-size: 10px; }
         .mini-preview-container .conector-visual::before,
-        .mini-preview-container .conector-visual::after { height: 1px; background-color: var(--cor-borda-input); }
-        .mini-preview-container .divisao-pinazio-peca { border-width: 0.5px; border-color: var(--cor-borda-input); }
+        .mini-preview-container .conector-visual::after { height: 1px; background-color: var(--pinazio-color, var(--cor-borda-input)); }
+        .mini-preview-container .divisao-pinazio-peca { border-width: 0.5px; border-color: var(--pinazio-color, var(--cor-borda-input)); }
 
         /* Botão Excluir */
         .delete-button {
@@ -354,6 +355,14 @@
             <div>
                 <label for="vaosVerticais" class="block text-sm font-medium">Divisões verticais:</label>
                 <input type="number" id="vaosVerticais" value="2" min="1" class="mt-1 block w-full rounded-md shadow-sm">
+            </div>
+            <div>
+                <label for="corCamara" class="block text-sm font-medium">Cor da câmara:</label>
+                <input type="color" id="corCamara" value="#f8fafc" class="mt-1 block w-full h-10 rounded-md shadow-sm p-0 border">
+            </div>
+            <div>
+                <label for="corPinazio" class="block text-sm font-medium">Cor do pinázio:</label>
+                <input type="color" id="corPinazio" value="#ffffff" class="mt-1 block w-full h-10 rounded-md shadow-sm p-0 border">
             </div>
             <div class="md:col-span-2 flex justify-center mt-4">
                  <button id="calculateButton" class="px-6 py-2 text-white rounded-md shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50">
@@ -464,6 +473,10 @@
 
         const specifySegmentsChecked = document.getElementById('specifySegments').checked;
         const ambienteNome = document.getElementById('ambienteNome').value.trim() || 'Ambiente';
+        const corCamaraEl = document.getElementById('corCamara');
+        const corPinazioEl = document.getElementById('corPinazio');
+        const corCamara = (corCamaraEl && corCamaraEl.value) ? corCamaraEl.value : '#f8fafc';
+        const corPinazio = (corPinazioEl && corPinazioEl.value) ? corPinazioEl.value : '#ffffff';
 
         // *** Validação Aprimorada ***
         if (
@@ -555,8 +568,12 @@
 
         // 7. Montagem do Resumo e HTML de Resultado
         lastCalculatedPieceSummary = {
-             ambiente: ambienteNome, barrasVerticais: [], barrasHorizontais: [], conectores: totalConectores,
-             previewParams: { larguraTotal: largura, alturaTotal: altura, numVaosHorizontais: numVaosHorizontais, numVaosVerticais: numVaosVerticais, numBarrasVerticais: numBarrasVerticais, numBarrasHorizontais: numBarrasHorizontais, larguraPinazio: larguraPinazio, realSegmentWidths: [...realSegmentWidths], realSegmentHeights: [...realSegmentHeights], specifySegmentsChecked: specifySegmentsChecked, specifiedSegmentWidths: [...specifiedSegmentWidths], specifiedSegmentHeights: [...specifiedSegmentHeights] }
+             ambiente: ambienteNome,
+             barrasVerticais: [],
+             barrasHorizontais: [],
+             conectores: totalConectores,
+             cores: { camara: corCamara, pinazio: corPinazio },
+            previewParams: { larguraTotal: largura, alturaTotal: altura, numVaosHorizontais: numVaosHorizontais, numVaosVerticais: numVaosVerticais, numBarrasVerticais: numBarrasVerticais, numBarrasHorizontais: numBarrasHorizontais, larguraPinazio: larguraPinazio, realSegmentWidths: [...realSegmentWidths], realSegmentHeights: [...realSegmentHeights], specifySegmentsChecked: specifySegmentsChecked, specifiedSegmentWidths: [...specifiedSegmentWidths], specifiedSegmentHeights: [...specifiedSegmentHeights], corCamara: corCamara, corPinazio: corPinazio }
         };
         document.getElementById('resultadoQuantidade').textContent = `Quantidade de peças: ${quantidade}`;
         let resultadoHTML = `<h3 class="font-semibold mb-1 mt-2" style="color: var(--cor-primaria);">Resumo das barras:</h3><table class="results-table text-sm"><thead><tr><th>Tipo</th><th>Medida (mm)</th><th>Qtd Total</th></tr></thead><tbody>`;
@@ -603,18 +620,25 @@
      function updateSegmentInputWarning(message) { const w = document.getElementById('segmentInputWarning'); if (w) w.textContent = message; }
 
      /** Desenha preview principal */
-     function desenharPreview(lT, aT, nVH, nVV, nBV, nBH, lP, rSW, rSH, sSC, sSW, sSH) { const pC = document.querySelector('.preview'); const pE = document.getElementById('preview-peca'); desenharPecaGenerico(pC, pE, { larguraTotal: lT, alturaTotal: aT, numVaosHorizontais: nVH, numVaosVerticais: nVV, numBarrasVerticais: nBV, numBarrasHorizontais: nBH, larguraPinazio: lP, realSegmentWidths: rSW, realSegmentHeights: rSH, specifySegmentsChecked: sSC, specifiedSegmentWidths: sSW, specifiedSegmentHeights: sSH }, 450, totalLabelMargin, totalLabelMarginHorizontal, segmentLabelMargin); }
+     function desenharPreview(lT, aT, nVH, nVV, nBV, nBH, lP, rSW, rSH, sSC, sSW, sSH) { const pC = document.querySelector('.preview'); const pE = document.getElementById('preview-peca'); const corCamara = (document.getElementById('corCamara') && document.getElementById('corCamara').value) ? document.getElementById('corCamara').value : getComputedStyle(document.documentElement).getPropertyValue('--cor-fundo-claro') || '#f8fafc'; const corPinazio = (document.getElementById('corPinazio') && document.getElementById('corPinazio').value) ? document.getElementById('corPinazio').value : '#ffffff'; desenharPecaGenerico(pC, pE, { larguraTotal: lT, alturaTotal: aT, numVaosHorizontais: nVH, numVaosVerticais: nVV, numBarrasVerticais: nBV, numBarrasHorizontais: nBH, larguraPinazio: lP, realSegmentWidths: rSW, realSegmentHeights: rSH, specifySegmentsChecked: sSC, specifiedSegmentWidths: sSW, specifiedSegmentHeights: sSH, corCamara: corCamara, corPinazio: corPinazio }, 450, totalLabelMargin, totalLabelMarginHorizontal, segmentLabelMargin); }
 
      /** Desenha mini-preview */
      function desenharMiniPreview(targetContainer, params) { const mPE = document.createElement('div'); mPE.classList.add('peca'); targetContainer.innerHTML = ''; targetContainer.appendChild(mPE); desenharPecaGenerico(targetContainer, mPE, params, 200, miniTotalLabelMargin, miniTotalLabelMarginHorizontal, miniSegmentLabelMargin); }
 
      /** Função Genérica para Desenhar Peça */
      function desenharPecaGenerico(containerElement, pecaElement, params, maxDimVisual, cotaTotalMargemVertical, cotaTotalMargemHorizontal, cotaSegmentoMargem) {
-         console.log(`Desenho (Max: ${maxDimVisual})`); const { larguraTotal, alturaTotal, numVaosHorizontais, numVaosVerticais, numBarrasVerticais, numBarrasHorizontais, larguraPinazio, realSegmentWidths, realSegmentHeights, specifySegmentsChecked, specifiedSegmentWidths, specifiedSegmentHeights } = params;
-         pecaElement.innerHTML = ''; containerElement.querySelectorAll('.dimension-label').forEach(l => l.remove());
+        console.log(`Desenho (Max: ${maxDimVisual})`); const { larguraTotal, alturaTotal, numVaosHorizontais, numVaosVerticais, numBarrasVerticais, numBarrasHorizontais, larguraPinazio, realSegmentWidths, realSegmentHeights, specifySegmentsChecked, specifiedSegmentWidths, specifiedSegmentHeights, corCamara, corPinazio } = params;
+        pecaElement.innerHTML = ''; containerElement.querySelectorAll('.dimension-label').forEach(l => l.remove());
          const minDimVisual = maxDimVisual * 0.1; let scale = 0; if (larguraTotal > 0 && alturaTotal > 0) { scale = Math.min(maxDimVisual / larguraTotal, maxDimVisual / alturaTotal); const sWT = larguraTotal * scale, sHT = alturaTotal * scale; if (sWT < minDimVisual && larguraTotal > 0) scale = Math.max(scale, minDimVisual / larguraTotal); if (sHT < minDimVisual && alturaTotal > 0) scale = Math.max(scale, minDimVisual / alturaTotal); const fSW = larguraTotal * scale, fSH = alturaTotal * scale; if (Math.max(fSW, fSH) > maxDimVisual) scale = maxDimVisual / Math.max(larguraTotal, alturaTotal); } else return;
          const scaledLarguraTotal = larguraTotal * scale; const scaledAlturaTotal = alturaTotal * scale; const scaledLarguraPinazio = Math.max(0.5, larguraPinazio * scale);
-         pecaElement.style.width = scaledLarguraTotal + 'px'; pecaElement.style.height = scaledAlturaTotal + 'px'; pecaElement.offsetWidth;
+        pecaElement.style.width = scaledLarguraTotal + 'px'; pecaElement.style.height = scaledAlturaTotal + 'px';
+        if (corCamara) {
+            pecaElement.style.backgroundColor = corCamara;
+        }
+        if (corPinazio) {
+            pecaElement.style.setProperty('--pinazio-color', corPinazio);
+        }
+        pecaElement.offsetWidth;
          const larguraRealSum = realSegmentWidths.reduce((s, w) => s + w, 0); const alturaRealSum = realSegmentHeights.reduce((s, h) => s + h, 0); const visualEspacoW = Math.max(0, scaledLarguraTotal - numBarrasVerticais * scaledLarguraPinazio); const visualEspacoH = Math.max(0, scaledAlturaTotal - numBarrasHorizontais * scaledLarguraPinazio); const visualW = realSegmentWidths.map(w => Math.max(0, (w / (larguraRealSum || larguraTotal || 1)) * visualEspacoW)); const visualH = realSegmentHeights.map(h => Math.max(0, (h / (alturaRealSum || alturaTotal || 1)) * visualEspacoH));
          if ((numVaosHorizontais > 0 || numVaosVerticais > 0) && scaledLarguraTotal >= 1 && scaledAlturaTotal >= 1) {
              if (visualW.some(w => w < -0.01) || visualH.some(h => h < -0.01)) { console.error("Erro visual: Segmentos < 0"); return; }
@@ -641,12 +665,21 @@
         const pN = document.getElementById('pedidoNumero').value.trim(); const aN = document.getElementById('ambienteNome').value.trim();
         if (pN === '') { alert("Preencha o Número do Pedido."); document.getElementById('pedidoNumero').focus(); return; } if (aN === '') { alert("Preencha o Nome do Ambiente."); document.getElementById('ambienteNome').focus(); return; }
         if (currentPedido.numero === '' || currentPedido.numero !== pN) { currentPedido.numero = pN; currentPedido.pecas = []; console.log(`Pedido: ${pN}`); }
-        const pPCopy = JSON.parse(JSON.stringify(lastCalculatedPieceSummary.previewParams)); const nP = { ambiente: aN, resumoBarras: [ ...lastCalculatedPieceSummary.barrasVerticais.map(b => ({ ...b, tipo: 'Vertical' })), ...lastCalculatedPieceSummary.barrasHorizontais.map(b => ({ ...b, tipo: 'Horizontal' })) ], conectores: lastCalculatedPieceSummary.conectores, dimensoes: { quantidade: parseInt(document.getElementById('quantidade').value) || 1, largura: parseFloat(document.getElementById('largura').value) || 0, altura: parseFloat(document.getElementById('altura').value) || 0, vaosHorizontais: parseInt(document.getElementById('vaosHorizontais').value) || 1, vaosVerticais: parseInt(document.getElementById('vaosVerticais').value) || 1, especificarSegmentos: document.getElementById('specifySegments').checked }, previewParams: pPCopy };
+        const pPCopy = JSON.parse(JSON.stringify(lastCalculatedPieceSummary.previewParams));
+        const coresDaPeca = (lastCalculatedPieceSummary && lastCalculatedPieceSummary.cores)
+            ? lastCalculatedPieceSummary.cores
+            : { camara: (document.getElementById('corCamara') && document.getElementById('corCamara').value) ? document.getElementById('corCamara').value : '#f8fafc',
+                pinazio: (document.getElementById('corPinazio') && document.getElementById('corPinazio').value) ? document.getElementById('corPinazio').value : '#ffffff' };
+        const nP = { ambiente: aN, resumoBarras: [ ...lastCalculatedPieceSummary.barrasVerticais.map(b => ({ ...b, tipo: 'Vertical' })), ...lastCalculatedPieceSummary.barrasHorizontais.map(b => ({ ...b, tipo: 'Horizontal' })) ], conectores: lastCalculatedPieceSummary.conectores, cores: coresDaPeca, dimensoes: { quantidade: parseInt(document.getElementById('quantidade').value) || 1, largura: parseFloat(document.getElementById('largura').value) || 0, altura: parseFloat(document.getElementById('altura').value) || 0, vaosHorizontais: parseInt(document.getElementById('vaosHorizontais').value) || 1, vaosVerticais: parseInt(document.getElementById('vaosVerticais').value) || 1, especificarSegmentos: document.getElementById('specifySegments').checked }, previewParams: pPCopy };
         currentPedido.pecas.push(nP); updatePedidoPecasList(); document.getElementById('ambienteNome').value = ''; lastCalculatedPieceSummary = null; document.getElementById('resultado').innerHTML = `<p>Peça <strong>"${aN}"</strong> adicionada ao Pedido <strong>${pN}</strong>.</p>`; limparPreview(); document.getElementById('captureContainer').style.display = 'none'; alert(`Peça "${aN}" adicionada ao Pedido ${pN}!`); document.getElementById('ambienteNome').focus();
     }
 
     /** Atualiza lista de peças */
-    function updatePedidoPecasList() { const lC = document.getElementById('pedidoPecasList'); const pH = document.getElementById('pedidoHeader'); lC.innerHTML = ''; let tPF = 0; currentPedido.pecas.forEach(p => { tPF += p.dimensoes.quantidade; }); if (pH) { pH.innerHTML = `Pedido: <span id="pedidoNumeroDisplay">${currentPedido.numero || 'N/A'}</span> (<span id="pedidoTotalPecas">${tPF}</span> peças)`; } if (currentPedido.pecas.length === 0) { lC.innerHTML = '<p class="text-gray-600">Nenhuma peça adicionada.</p>'; return; } currentPedido.pecas.forEach((peca, index) => { const pID = document.createElement('div'); pID.classList.add('pedido-peca-item'); const dD = document.createElement('div'); dD.classList.add('peca-item-details'); let iH = `<h4>Ambiente: ${peca.ambiente}</h4><p class="text-xs text-gray-600 mb-2">(${peca.dimensoes.quantidade}x ${peca.dimensoes.largura}mm x ${peca.dimensoes.altura}mm${peca.dimensoes.especificarSegmentos ? ', Seg. Espec.' : ''})</p>`; if (peca.resumoBarras.length > 0) { iH += `<h5 class="font-semibold mb-1 text-sm" style="color: var(--cor-primaria);">Barras:</h5><table class="results-table"><thead><tr><th>Tipo</th><th>Medida (mm)</th><th>Qtd Total</th></tr></thead><tbody>`; peca.resumoBarras.forEach(b => { iH += `<tr><td>${b.tipo}</td><td>${b.medida}</td><td>${b.quantidade}</td></tr>`; }); iH += `</tbody></table>`; } else { iH += `<p class="text-xs mt-2">Nenhuma barra.</p>`; } if (peca.conectores > 0) { iH += `<p class="text-sm mt-2">Conectores: ${peca.conectores} unidades</p>`; } else { iH += `<p class="text-xs mt-2">Nenhum conector.</p>`; } dD.innerHTML = iH; const mPD = document.createElement('div'); mPD.classList.add('mini-preview-container'); pID.appendChild(dD); pID.appendChild(mPD); const dB = document.createElement('button'); dB.classList.add('delete-button'); dB.textContent = 'Excluir'; dB.addEventListener('click', () => excluirPecaDoPedido(index)); pID.appendChild(dB); lC.appendChild(pID); requestAnimationFrame(() => { if (document.body.contains(mPD)) { desenharMiniPreview(mPD, peca.previewParams); } }); }); }
+    function updatePedidoPecasList() { const lC = document.getElementById('pedidoPecasList'); const pH = document.getElementById('pedidoHeader'); lC.innerHTML = ''; let tPF = 0; currentPedido.pecas.forEach(p => { tPF += p.dimensoes.quantidade; }); if (pH) { pH.innerHTML = `Pedido: <span id="pedidoNumeroDisplay">${currentPedido.numero || 'N/A'}</span> (<span id="pedidoTotalPecas">${tPF}</span> peças)`; } if (currentPedido.pecas.length === 0) { lC.innerHTML = '<p class="text-gray-600">Nenhuma peça adicionada.</p>'; return; } currentPedido.pecas.forEach((peca, index) => { const pID = document.createElement('div'); pID.classList.add('pedido-peca-item'); const dD = document.createElement('div'); dD.classList.add('peca-item-details'); let iH = `<h4>Ambiente: ${peca.ambiente}</h4><p class="text-xs text-gray-600 mb-2">(${peca.dimensoes.quantidade}x ${peca.dimensoes.largura}mm x ${peca.dimensoes.altura}mm${peca.dimensoes.especificarSegmentos ? ', Seg. Espec.' : ''})</p>`; if (peca.resumoBarras.length > 0) { iH += `<h5 class="font-semibold mb-1 text-sm" style="color: var(--cor-primaria);">Barras:</h5><table class="results-table"><thead><tr><th>Tipo</th><th>Medida (mm)</th><th>Qtd Total</th></tr></thead><tbody>`; peca.resumoBarras.forEach(b => { iH += `<tr><td>${b.tipo}</td><td>${b.medida}</td><td>${b.quantidade}</td></tr>`; }); iH += `</tbody></table>`; } else { iH += `<p class="text-xs mt-2">Nenhuma barra.</p>`; } if (peca.conectores > 0) { iH += `<p class="text-sm mt-2">Conectores: ${peca.conectores} unidades</p>`; } else { iH += `<p class="text-xs mt-2">Nenhum conector.</p>`; }
+        const cCam = (peca.cores && peca.cores.camara) ? peca.cores.camara : '#f8fafc';
+        const cPin = (peca.cores && peca.cores.pinazio) ? peca.cores.pinazio : '#ffffff';
+        iH += `<h5 class="font-semibold mb-1 text-sm" style="color: var(--cor-primaria);">Cores:</h5><div class="text-sm"><div class="flex items-center gap-2"><span>Cor da câmara:</span><span class="inline-block w-4 h-4 rounded border" style="background-color: ${cCam};"></span><span class="text-xs font-mono">${cCam}</span></div><div class="flex items-center gap-2 mt-1"><span>Cor do pinázio:</span><span class="inline-block w-4 h-4 rounded border" style="background-color: ${cPin};"></span><span class="text-xs font-mono">${cPin}</span></div></div>`;
+        dD.innerHTML = iH; const mPD = document.createElement('div'); mPD.classList.add('mini-preview-container'); pID.appendChild(dD); pID.appendChild(mPD); const dB = document.createElement('button'); dB.classList.add('delete-button'); dB.textContent = 'Excluir'; dB.addEventListener('click', () => excluirPecaDoPedido(index)); pID.appendChild(dB); lC.appendChild(pID); requestAnimationFrame(() => { if (document.body.contains(mPD)) { desenharMiniPreview(mPD, peca.previewParams); } }); }); }
 
     /** Remove peça */
     function excluirPecaDoPedido(index) { if (index < 0 || index >= currentPedido.pecas.length) { console.error("Índice inválido:", index); return; } if (confirm(`Excluir peça "${currentPedido.pecas[index].ambiente}"?`)) { currentPedido.pecas.splice(index, 1); updatePedidoPecasList(); console.log("Peça excluída."); } else { console.log("Exclusão cancelada."); } }
