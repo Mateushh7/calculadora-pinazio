@@ -19,9 +19,9 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
         specifySegmentsChecked, specifiedSegmentWidths, specifiedSegmentHeights,
     } = params;
 
-    const maxDim = 400;
-    const cotaTotal = 30;
-    const cotaSeg = 8;
+    const maxDim = 500;
+    const cotaTotal = 36;
+    const cotaSeg = 10;
     const DPR = 2;
 
     let scale = Math.min(maxDim / larguraTotal, maxDim / alturaTotal);
@@ -37,10 +37,10 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
     const hasSegV = numVaosVerticais > 1;
 
     // ── Painel Resultados ──────────────────────────────────────────────
-    const panelW = 195;
-    const panelPad = 12;
-    const lineH = 16;
-    const titleH = 22;
+    const panelW = 260;
+    const panelPad = 14;
+    const lineH = 22;
+    const titleH = 28;
     const barras = (resumo.barrasVerticais || []).concat(resumo.barrasHorizontais || []);
     const panelLines = [];
     panelLines.push({ type: 'title', text: 'Resultados' });
@@ -184,20 +184,20 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
     // ── Cotas (apenas texto) ───────────────────────────────────────────
     const lc = '#3a5a6b';
 
-    ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = lc;
+    ctx.font = 'bold 14px sans-serif'; ctx.fillStyle = lc;
     ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.fillText(fmtNum(larguraTotal), ox + scaledW / 2, oy - 4);
+    ctx.fillText(fmtNum(larguraTotal), ox + scaledW / 2, oy - 5);
 
     ctx.save();
-    ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = lc;
+    ctx.font = 'bold 14px sans-serif'; ctx.fillStyle = lc;
     ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.translate(ox + scaledW + 14, oy + scaledH / 2);
+    ctx.translate(ox + scaledW + 18, oy + scaledH / 2);
     ctx.rotate(Math.PI / 2);
     ctx.fillText(fmtNum(alturaTotal), 0, 0);
     ctx.restore();
 
     if (hasSegH) {
-        ctx.font = '9px sans-serif'; ctx.fillStyle = lc;
+        ctx.font = '12px sans-serif'; ctx.fillStyle = lc;
         ctx.textAlign = 'center'; ctx.textBaseline = 'top';
         let cLS = 0;
         for (let j = 0; j < numVaosHorizontais; j++) {
@@ -210,7 +210,7 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
     }
 
     if (hasSegV) {
-        ctx.font = '9px sans-serif'; ctx.fillStyle = lc;
+        ctx.font = '12px sans-serif'; ctx.fillStyle = lc;
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
         let cTS = 0;
         for (let i = 0; i < numVaosVerticais; i++) {
@@ -223,7 +223,7 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
     }
 
     // Título Ambiente
-    ctx.font = 'bold 13px sans-serif'; ctx.fillStyle = '#3a5a6b';
+    ctx.font = 'bold 17px sans-serif'; ctx.fillStyle = '#3a5a6b';
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.fillText('Ambiente: ' + ambienteNome, marginLeft, marginTop / 2);
 
@@ -240,29 +240,29 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
     ctx.stroke();
 
     let curY = py + panelPad;
-    const colWs = [62, 82, 35];
+    const colWs = [80, 110, 50];
     panelLines.forEach((line) => {
         const textX = px + panelPad;
         switch (line.type) {
             case 'title':
-                ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = '#3a5a6b';
+                ctx.font = 'bold 16px sans-serif'; ctx.fillStyle = '#3a5a6b';
                 ctx.textAlign = 'left'; ctx.textBaseline = 'top';
                 ctx.fillText(line.text, textX, curY);
                 curY += titleH;
                 ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 0.5;
                 ctx.beginPath();
-                ctx.moveTo(textX, curY - 5);
-                ctx.lineTo(px + panelW - panelPad, curY - 5);
+                ctx.moveTo(textX, curY - 6);
+                ctx.lineTo(px + panelW - panelPad, curY - 6);
                 ctx.stroke();
                 break;
             case 'section':
-                ctx.font = 'bold 10px sans-serif'; ctx.fillStyle = '#3a5a6b';
+                ctx.font = 'bold 13px sans-serif'; ctx.fillStyle = '#3a5a6b';
                 ctx.textAlign = 'left'; ctx.textBaseline = 'top';
                 ctx.fillText(line.text, textX, curY + 2);
                 curY += lineH;
                 break;
             case 'label':
-                ctx.font = '10px sans-serif'; ctx.fillStyle = '#334155';
+                ctx.font = '13px sans-serif'; ctx.fillStyle = '#334155';
                 ctx.textAlign = 'left'; ctx.textBaseline = 'top';
                 ctx.fillText(line.text, textX + 4, curY);
                 curY += lineH;
@@ -270,10 +270,10 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
             case 'header': {
                 ctx.fillStyle = '#f1f5f9';
                 ctx.fillRect(textX, curY - 1, panelW - panelPad * 2, lineH + 1);
-                ctx.font = 'bold 9px sans-serif'; ctx.fillStyle = '#64748b';
+                ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = '#64748b';
                 ctx.textAlign = 'left'; ctx.textBaseline = 'top';
                 let cx = textX + 4;
-                line.cols.forEach((c, i) => { ctx.fillText(c, cx, curY + 1); cx += colWs[i]; });
+                line.cols.forEach((c, i) => { ctx.fillText(c, cx, curY + 3); cx += colWs[i]; });
                 curY += lineH;
                 ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 0.5;
                 ctx.beginPath(); ctx.moveTo(textX, curY); ctx.lineTo(px + panelW - panelPad, curY); ctx.stroke();
@@ -282,20 +282,20 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
             case 'obs': {
                 const obsW = panelW - panelPad * 2;
                 ctx.fillStyle = '#fefce8';
-                ctx.fillRect(textX, curY - 1, obsW, lineH + 2);
+                ctx.fillRect(textX, curY - 1, obsW, lineH + 4);
                 ctx.strokeStyle = '#fde68a'; ctx.lineWidth = 0.5;
-                ctx.strokeRect(textX, curY - 1, obsW, lineH + 2);
-                ctx.font = '10px sans-serif'; ctx.fillStyle = '#334155';
+                ctx.strokeRect(textX, curY - 1, obsW, lineH + 4);
+                ctx.font = '13px sans-serif'; ctx.fillStyle = '#334155';
                 ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-                ctx.fillText(line.text, textX + 4, curY + 1);
-                curY += lineH + 4;
+                ctx.fillText(line.text, textX + 4, curY + 2);
+                curY += lineH + 6;
                 break;
             }
             case 'row': {
-                ctx.font = '10px sans-serif'; ctx.fillStyle = '#334155';
+                ctx.font = '13px sans-serif'; ctx.fillStyle = '#334155';
                 ctx.textAlign = 'left'; ctx.textBaseline = 'top';
                 let cx = textX + 4;
-                line.cols.forEach((c, i) => { ctx.fillText(c, cx, curY + 1); cx += colWs[i]; });
+                line.cols.forEach((c, i) => { ctx.fillText(c, cx, curY + 3); cx += colWs[i]; });
                 curY += lineH;
                 ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 0.5;
                 ctx.beginPath(); ctx.moveTo(textX, curY); ctx.lineTo(px + panelW - panelPad, curY); ctx.stroke();

@@ -1,9 +1,11 @@
 /**
  * Handlers de download — imagem PNG da peça atual e PDF do pedido completo.
  *
+ * Ambos usam gerarCanvasPeca (mesmo renderer) para garantir consistência visual
+ * e legibilidade no impresso.
+ *
  * Depende globalmente de:
- *   - window.html2canvas (CDN no index.html)
- *   - window.jspdf       (CDN no index.html)
+ *   - window.jspdf (CDN no index.html)
  */
 
 import { $ } from '../utils/dom.js';
@@ -45,17 +47,19 @@ export function handleDownloadImage() {
 }
 
 /**
- * Gera um PDF com cada item do pedido em sequência, usando html2canvas para capturar
- * cada .pedido-peca-item como imagem.
+ * Gera um PDF do pedido completo. Cada peça é renderizada via gerarCanvasPeca
+ * (mesmo motor do download de imagem), o que dá texto nítido e legível ao imprimir.
+ *
+ * Layout: A4 retrato, várias peças por página (empilhadas verticalmente).
+ * Cada peça é escalada para ocupar a largura útil da página.
  */
 export async function handleDownloadPDF() {
     const { jsPDF } = window.jspdf;
     const pedidoNum = $('pedidoNumero').value.trim() || 'sP';
-    const lista = $('pedidoPecasList');
-    const items = lista.querySelectorAll('.pedido-peca-item');
     const btn = $('downloadPdfButton');
+    const pecas = state.currentPedido.pecas;
 
-    if (items.length === 0) {
+    if (!pecas || pecas.length === 0) {
         alert('Nenhuma peça para gerar PDF.');
         return;
     }
@@ -68,46 +72,49 @@ export async function handleDownloadPDF() {
     const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
-    const margin = 15;
+    const margin = 12;
     const availW = pageW - margin * 2;
+    const gap = 5;
+    // Largura fixa por peça (mm) — escolhida para caber 3 peças por página A4
+    // mantendo fontes legíveis. Se a proporção do canvas for muito alta, mais
+    // peças podem caber automaticamente via o teste de overflow abaixo.
+    const itemWidth = 140;
+    const itemX = margin + (availW - itemWidth) / 2;
     let y = margin;
 
     const headerText = $('pedidoHeader').innerText;
     pdf.setFontSize(14);
     pdf.text(headerText, margin, y);
-    y += 10;
-
-    // Esconde temporariamente os botões de excluir para não aparecerem no PDF
-    const deleteButtons = lista.querySelectorAll('.delete-button');
-    deleteButtons.forEach((b) => { b.style.visibility = 'hidden'; });
+    y += 8;
 
     try {
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
+        for (let i = 0; i < pecas.length; i++) {
+            const peca = pecas[i];
             try {
-                const canvas = await window.html2canvas(item, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: window.getComputedStyle(item).backgroundColor || '#ffffff',
-                });
-                const imgData = canvas.toDataURL('image/png');
-                const scaleFactor = availW / canvas.width;
-                const finalW = canvas.width * scaleFactor;
-                const finalH = canvas.height * scaleFactor;
+                const resumo = resumoDoPeca(peca);
+                const canvas = gerarCanvasPeca(
+                    peca.previewParams,
+                    resumo,
+                    peca.ambiente,
+                    peca.cores?.camaraNome || 'PRATA',
+                    peca.cores?.pinazioNome || 'BRANCO',
+                );
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                const finalW = itemWidth;
+                const finalH = (canvas.height / canvas.width) * finalW;
 
                 if (y + finalH > pageH - margin) {
                     pdf.addPage();
                     y = margin;
                 }
-                pdf.addImage(imgData, 'PNG', margin, y, finalW, finalH);
-                y += finalH + 5;
+                pdf.addImage(imgData, 'JPEG', itemX, y, finalW, finalH);
+                y += finalH + gap;
             } catch (e) {
-                console.error(`Erro ao gerar item ${i + 1} do PDF:`, e);
+                console.error(`Erro ao gerar peça ${i + 1} do PDF:`, e);
             }
         }
     } finally {
-        deleteButtons.forEach((b) => { b.style.visibility = 'visible'; });
         if (btn) {
             btn.textContent = '↓ Download PDF';
             btn.disabled = false;
@@ -115,4 +122,25 @@ export async function handleDownloadPDF() {
     }
 
     pdf.save(`PINAZIOS ${pedidoNum}.pdf`);
+}
+
+/**
+ * Constrói o objeto `resumo` que gerarCanvasPeca espera a partir de uma peça
+ * armazenada em state.currentPedido.pecas[*].
+ */
+function resumoDoPeca(peca) {
+    const verticais = (peca.resumoBarras || [])
+        .filter((b) => b.tipo === 'Vertical')
+        .map((b) => ({ tipo: 'Vertical', medida: b.medida, quantidade: b.quantidade }));
+    const horizontais = (peca.resumoBarras || [])
+        .filter((b) => b.tipo === 'Horizontal')
+        .map((b) => ({ tipo: 'Horizontal', medida: b.medida, quantidade: b.quantidade }));
+
+    return {
+        quantidade: peca.dimensoes?.quantidade || 1,
+        barrasVerticais: verticais,
+        barrasHorizontais: horizontais,
+        conectores: peca.conectores || 0,
+        obs: peca.obs || '',
+    };
 }
