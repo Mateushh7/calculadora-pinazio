@@ -1,0 +1,40 @@
+/* ============================================================
+   PRINT — estilos para impressão / export PDF
+   ============================================================ */
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #pedidoPecasListContainer,
+    #pedidoPecasListContainer * {
+        visibility: visible;
+    }
+
+    #pedidoPecasListContainer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 10mm;
+        box-shadow: none;
+        border: none;
+        background: white;
+    }
+
+    .pedido-peca-item {
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+        overflow: visible;
+    }
+
+    .delete-button {
+        display: none;
+    }
+
+    .mini-preview-container {
+        page-break-inside: avoid;
+    }
+}

@@ -1,0 +1,48 @@
+/* ============================================================
+   BASE — variáveis, reset e estilos globais
+   ============================================================ */
+
+:root {
+    --primary: #163A4A;
+    --primary-mid: #2C6E7A;
+    --primary-light: #6DAFB8;
+    --accent: #C63832;
+    --accent-hover: #a82e29;
+    --action: #2C6E7A;
+    --action-hover: #235a65;
+    --success: #16a34a;
+    --success-hover: #15803d;
+    --indigo: #2C6E7A;
+    --indigo-hover: #163A4A;
+    --bg-page: #F5F7F8;
+    --bg-sidebar: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-light: #f0f8f9;
+    --bg-input: #ffffff;
+    --border-color: #d1e4e8;
+    --border-input: #9ecdd4;
+    --text-main: #163A4A;
+    --text-muted: #4a7a87;
+    --text-label: #2C6E7A;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(22, 58, 74, 0.10);
+    --shadow-sm: 0 2px 8px rgba(22, 58, 74, 0.08);
+    --transition: 0.2s ease;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-page);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+}

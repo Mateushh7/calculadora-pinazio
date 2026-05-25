@@ -1,0 +1,271 @@
+/* ============================================================
+   PREVIEW — desenho da peça, cotas, mini-preview do pedido
+   ============================================================ */
+
+#previewTitleAmbiente {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--primary-mid);
+    margin-bottom: 0.75rem;
+    min-height: 1.5rem;
+    letter-spacing: 0.02em;
+}
+
+.preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background: #ffffff;
+    border-radius: var(--radius-sm);
+    padding: 2.5rem;
+    border: 1.5px solid var(--border-color);
+    overflow: visible;
+    position: relative;
+}
+
+.peca {
+    position: relative;
+    background-color: var(--primary-light);
+    opacity: 0.8;
+    border: 2px solid var(--primary-mid);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.divisao-segmento {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-sizing: border-box;
+    position: absolute;
+}
+
+.divisao-pinazio-peca {
+    background-color: var(--pinazio-color, #ffffff);
+    border: 1px solid var(--pinazio-color, var(--border-input));
+    box-sizing: border-box;
+    position: absolute;
+}
+
+.pinazio-horizontal-peca {
+    z-index: 1;
+}
+
+.pinazio-vertical-peca {
+    z-index: 2;
+}
+
+.conector-visual {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.conector-visual::before,
+.conector-visual::after {
+    content: '';
+    position: absolute;
+    background-color: var(--pinazio-color, var(--border-input));
+}
+
+.conector-visual::before {
+    width: 100%;
+    height: 2px;
+    transform: rotate(45deg);
+}
+
+.conector-visual::after {
+    width: 100%;
+    height: 2px;
+    transform: rotate(-45deg);
+}
+
+.dimension-label {
+    position: absolute;
+    font-weight: 600;
+    color: var(--primary-mid);
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    z-index: 10;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.total-dimension-label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.segment-label-horizontal {
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.segment-label-vertical {
+    transform-origin: center center;
+}
+
+.preview-error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--accent);
+    text-align: center;
+    padding: 10px;
+    background: #fff8f8;
+    border-radius: 8px;
+    z-index: 5;
+    pointer-events: none;
+    border: 1px solid rgba(198, 56, 50, 0.3);
+}
+
+#previewCoresInfo {
+    display: none;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 10px;
+    color: var(--text-muted);
+}
+
+#previewCoresInfo strong {
+    color: var(--text-main);
+}
+
+/* ── PEDIDO SECTION ── */
+.pedido-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.pedido-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#pedidoHeader {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary-mid);
+}
+
+.pedido-pecas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.pedido-peca-item {
+    background: transparent;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+    overflow-x: auto;
+    transition: border-color var(--transition);
+}
+
+.pedido-peca-item:hover {
+    border-color: var(--primary-light);
+}
+
+.peca-item-details {
+    min-width: 0;
+    flex: 1;
+}
+
+.peca-item-details h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-mid);
+    margin-bottom: 4px;
+}
+
+.peca-item-details .peca-dims {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.peca-item-details .results-table {
+    max-width: 280px;
+    margin-top: 6px;
+}
+
+.mini-preview-container {
+    flex-shrink: 0;
+    width: 420px;
+    height: 420px;
+    padding: 50px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+    margin-left: auto;
+}
+
+.mini-preview-container .peca {
+    border-width: 1px;
+    background-color: var(--primary-light);
+    opacity: 0.8;
+    border-color: var(--primary-mid);
+}
+
+.mini-preview-container .dimension-label {
+    font-size: 9px;
+    color: var(--primary-mid);
+}
+
+.mini-preview-container .total-dimension-label {
+    font-size: 10px;
+}
+
+.mini-preview-container .conector-visual::before,
+.mini-preview-container .conector-visual::after {
+    height: 1px;
+    background-color: var(--pinazio-color, var(--border-input));
+}
+
+.mini-preview-container .divisao-pinazio-peca {
+    border-width: 0.5px;
+    border-color: var(--pinazio-color, var(--border-input));
+}
+
+.delete-button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 15;
+    background: var(--accent);
+    font-family: inherit;
+    transition: background var(--transition);
+}
+
+.delete-button:hover {
+    background: var(--accent-hover);
+}
