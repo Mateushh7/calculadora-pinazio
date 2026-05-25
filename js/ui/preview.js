@@ -65,7 +65,9 @@ function desenharPecaGenerico(
         larguraPinazio,
         realSegmentWidths, realSegmentHeights,
         specifySegmentsChecked, specifiedSegmentWidths, specifiedSegmentHeights,
+        modelo, direcaoInteira,
     } = params;
+    const isNovo = modelo === 'novo';
 
     pecaElement.innerHTML = '';
     containerElement.querySelectorAll('.dimension-label').forEach((l) => l.remove());
@@ -117,50 +119,82 @@ function desenharPecaGenerico(
             cTSD += visualH[i] + (i < numBarrasHorizontais ? scaledLarguraPinazio : 0);
         }
 
-        // Barras verticais
-        if (numBarrasVerticais > 0) {
-            let bL = 0;
-            for (let j = 0; j < numBarrasVerticais; j++) {
-                bL += visualW[j];
+        if (isNovo && direcaoInteira === 'vertical') {
+            // Pinázio Novo: verticais inteiras (atravessam toda a altura),
+            // horizontais conectadas (em pedaços entre as verticais).
+
+            // Horizontais primeiro (ficam por baixo das inteiras)
+            if (numBarrasHorizontais > 0) {
                 let bT = 0;
-                for (let i = 0; i < numVaosVerticais; i++) {
-                    if (visualH[i] > 0 && scaledLarguraPinazio > 0) {
-                        createDiv(pecaElement, ['divisao-pinazio-peca', 'pinazio-vertical-peca'], bL, bT, scaledLarguraPinazio, visualH[i]);
+                for (let i = 0; i < numBarrasHorizontais; i++) {
+                    bT += visualH[i];
+                    let bL = 0;
+                    for (let j = 0; j < numVaosHorizontais; j++) {
+                        if (visualW[j] > 0 && scaledLarguraPinazio > 0) {
+                            createDiv(pecaElement, ['divisao-pinazio-peca', 'pinazio-horizontal-peca'], bL, bT, visualW[j], scaledLarguraPinazio);
+                        }
+                        bL += visualW[j] + (j < numBarrasVerticais ? scaledLarguraPinazio : 0);
                     }
-                    bT += visualH[i] + (i < numBarrasHorizontais ? scaledLarguraPinazio : 0);
+                    bT += scaledLarguraPinazio;
                 }
-                bL += scaledLarguraPinazio;
             }
-        }
-
-        // Barras horizontais
-        if (numBarrasHorizontais > 0) {
-            let bT = 0;
-            for (let i = 0; i < numBarrasHorizontais; i++) {
-                bT += visualH[i];
+            // Verticais como blocos contínuos cobrindo toda a altura — z-index maior
+            if (numBarrasVerticais > 0) {
                 let bL = 0;
-                for (let j = 0; j < numVaosHorizontais; j++) {
-                    if (visualW[j] > 0 && scaledLarguraPinazio > 0) {
-                        createDiv(pecaElement, ['divisao-pinazio-peca', 'pinazio-horizontal-peca'], bL, bT, visualW[j], scaledLarguraPinazio);
-                    }
-                    bL += visualW[j] + (j < numBarrasVerticais ? scaledLarguraPinazio : 0);
+                for (let j = 0; j < numBarrasVerticais; j++) {
+                    bL += visualW[j];
+                    createDiv(pecaElement, ['divisao-pinazio-peca', 'pinazio-vertical-peca', 'pinazio-inteira'], bL, 0, scaledLarguraPinazio, scaledAlturaTotal);
+                    bL += scaledLarguraPinazio;
                 }
-                bT += scaledLarguraPinazio;
             }
-        }
+        } else {
+            // Pinázio Antigo — comportamento original.
 
-        // Conectores (X) nas interseções
-        if (numBarrasVerticais > 0 && numBarrasHorizontais > 0 && scaledLarguraPinazio > 0) {
-            let cL = 0;
-            for (let i = 0; i < numBarrasVerticais; i++) {
-                cL += visualW[i];
-                let cT = 0;
-                for (let j = 0; j < numBarrasHorizontais; j++) {
-                    cT += visualH[j];
-                    createDiv(pecaElement, ['conector-visual'], cL, cT, scaledLarguraPinazio, scaledLarguraPinazio);
-                    cT += scaledLarguraPinazio;
+            // Barras verticais (segmentadas pelas horizontais)
+            if (numBarrasVerticais > 0) {
+                let bL = 0;
+                for (let j = 0; j < numBarrasVerticais; j++) {
+                    bL += visualW[j];
+                    let bT = 0;
+                    for (let i = 0; i < numVaosVerticais; i++) {
+                        if (visualH[i] > 0 && scaledLarguraPinazio > 0) {
+                            createDiv(pecaElement, ['divisao-pinazio-peca', 'pinazio-vertical-peca'], bL, bT, scaledLarguraPinazio, visualH[i]);
+                        }
+                        bT += visualH[i] + (i < numBarrasHorizontais ? scaledLarguraPinazio : 0);
+                    }
+                    bL += scaledLarguraPinazio;
                 }
-                cL += scaledLarguraPinazio;
+            }
+
+            // Barras horizontais (segmentadas pelas verticais)
+            if (numBarrasHorizontais > 0) {
+                let bT = 0;
+                for (let i = 0; i < numBarrasHorizontais; i++) {
+                    bT += visualH[i];
+                    let bL = 0;
+                    for (let j = 0; j < numVaosHorizontais; j++) {
+                        if (visualW[j] > 0 && scaledLarguraPinazio > 0) {
+                            createDiv(pecaElement, ['divisao-pinazio-peca', 'pinazio-horizontal-peca'], bL, bT, visualW[j], scaledLarguraPinazio);
+                        }
+                        bL += visualW[j] + (j < numBarrasVerticais ? scaledLarguraPinazio : 0);
+                    }
+                    bT += scaledLarguraPinazio;
+                }
+            }
+
+            // Conectores (X) nas interseções
+            if (numBarrasVerticais > 0 && numBarrasHorizontais > 0 && scaledLarguraPinazio > 0) {
+                let cL = 0;
+                for (let i = 0; i < numBarrasVerticais; i++) {
+                    cL += visualW[i];
+                    let cT = 0;
+                    for (let j = 0; j < numBarrasHorizontais; j++) {
+                        cT += visualH[j];
+                        createDiv(pecaElement, ['conector-visual'], cL, cT, scaledLarguraPinazio, scaledLarguraPinazio);
+                        cT += scaledLarguraPinazio;
+                    }
+                    cL += scaledLarguraPinazio;
+                }
             }
         }
     }
@@ -184,6 +218,9 @@ function desenharPecaGenerico(
                 let cLS = 0;
                 for (let j = 0; j < numVaosHorizontais; j++) {
                     if (i === numVaosVerticais - 1 && numVaosHorizontais > 0) {
+                        // Cota exibida na peça é nominal (largura/numVaos) — dá uma noção
+                        // simétrica da divisão. Os tamanhos reais com descontos / sobreposição
+                        // aparecem na tabela de resultados e no breakdown.
                         const wS = specifySegmentsChecked && specifiedSegmentWidths[j] !== undefined
                             ? specifiedSegmentWidths[j]
                             : (larguraTotal / numVaosHorizontais);

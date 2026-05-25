@@ -55,6 +55,11 @@
     z-index: 2;
 }
 
+/* Pinázio Novo — barra inteira fica acima das conectadas */
+.pinazio-inteira {
+    z-index: 4;
+}
+
 .conector-visual {
     position: absolute;
     z-index: 3;
@@ -193,6 +198,20 @@
     font-weight: 600;
     color: var(--primary-mid);
     margin-bottom: 4px;
+}
+
+.peca-item-details .peca-tipo {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary-mid);
+    background: var(--bg-card-light);
+    border: 1px solid var(--border-color);
+    border-radius: 99px;
+    padding: 2px 10px;
+    margin: 0 0 0.4rem;
 }
 
 .peca-item-details .peca-dims {

@@ -19,7 +19,7 @@
  *     conectores: number,
  *     realSegmentWidths:  number[],   // tamanhos reais (mm) usados no preview
  *     realSegmentHeights: number[],
- *     breakdown: Breakdown            // estrutura do cálculo visível (ver pinazioPadrao.js)
+ *     breakdown: Breakdown            // estrutura do cálculo visível (ver pinazioAntigo.js)
  *   }
  *
  * Para adicionar um novo tipo de pinázio:
@@ -27,12 +27,12 @@
  *   2. Importe-o aqui e adicione a CALCULATORS.
  */
 
-import { pinazioPadrao } from './pinazioPadrao.js';
-import { pinazioTipoB } from './pinazioTipoB.js';
+import { pinazioAntigo } from './pinazioAntigo.js';
+import { pinazioNovo } from './pinazioNovo.js';
 
 const CALCULATORS = {
-    [pinazioPadrao.id]: pinazioPadrao,
-    [pinazioTipoB.id]: pinazioTipoB,
+    [pinazioAntigo.id]: pinazioAntigo,
+    [pinazioNovo.id]: pinazioNovo,
 };
 
 /**
@@ -55,4 +55,4 @@ export function getCalculator(id) {
 /**
  * Id da calculadora padrão (default no select).
  */
-export const DEFAULT_CALCULATOR_ID = pinazioPadrao.id;
+export const DEFAULT_CALCULATOR_ID = pinazioAntigo.id;

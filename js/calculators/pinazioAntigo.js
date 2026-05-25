@@ -1,5 +1,5 @@
 /**
- * Pinázio Padrão — cálculo original da calculadora.
+ * Pinázio Antigo — cálculo original da calculadora (modelo de pinázio antigo, 18mm).
  *
  * Aplica descontos fixos (perfil, poli, borda) na largura/altura total da peça,
  * subtrai o espaço ocupado pelas próprias barras de pinázio (18 mm cada),
@@ -15,9 +15,9 @@ const DESCONTO_BORDA_DIM = 2;
 const LARGURA_PINAZIO = 18;
 const FLOAT_TOLERANCE = 0.01;
 
-export const pinazioPadrao = {
-    id: 'padrao',
-    label: 'Pinázio Padrão (18mm)',
+export const pinazioAntigo = {
+    id: 'antigo',
+    label: 'Pinázio Antigo (18mm)',
     descricao: 'Cálculo com descontos de perfil (14), poli (10), borda (2) e barras de 18mm.',
     larguraPinazio: LARGURA_PINAZIO,
 
@@ -105,32 +105,22 @@ export const pinazioPadrao = {
         const breakdown = {
             calculadora: this.label,
             largura: criarBreakdownDimensao({
-                eixo: 'Largura',
+                eixo: 'Largura — barras horizontais',
                 total: largura,
-                descontoPerfil: DESCONTO_PERFIL,
-                descontoPoli: DESCONTO_POLI,
                 numBarras: numBarrasVerticais,
-                larguraPinazio: LARGURA_PINAZIO,
-                descontoBorda: DESCONTO_BORDA_DIM,
                 disponivel: finalLargura,
                 numVaos: numVaosHorizontais,
-                segmentos: realSegmentWidths,
                 modoDivisao,
-                segmentosEspecificados: specifiedSegmentWidths,
+                rotuloBarra: 'Comprimento das barras horizontais',
             }),
             altura: criarBreakdownDimensao({
-                eixo: 'Altura',
+                eixo: 'Altura — barras verticais',
                 total: altura,
-                descontoPerfil: DESCONTO_PERFIL,
-                descontoPoli: DESCONTO_POLI,
                 numBarras: numBarrasHorizontais,
-                larguraPinazio: LARGURA_PINAZIO,
-                descontoBorda: DESCONTO_BORDA_DIM,
                 disponivel: finalAltura,
                 numVaos: numVaosVerticais,
-                segmentos: realSegmentHeights,
                 modoDivisao,
-                segmentosEspecificados: specifiedSegmentHeights,
+                rotuloBarra: 'Comprimento das barras verticais',
             }),
             conectores: {
                 formula: `${quantidade} peça(s) × ${numBarrasVerticais} barras verticais × ${numBarrasHorizontais} barras horizontais`,
@@ -191,17 +181,20 @@ function agruparBarras(segmentos, numBarras, quantidade) {
 }
 
 /**
- * Constrói o breakdown de uma dimensão (largura ou altura).
- * Cada `step` representa uma linha visível na UI.
+ * Constrói o breakdown de uma dimensão. O resultado final é o comprimento
+ * das barras dessa direção. Não listamos vãos.
  */
 function criarBreakdownDimensao({
-    eixo, total, descontoPerfil, descontoPoli,
-    numBarras, larguraPinazio, descontoBorda,
-    disponivel, numVaos, segmentos,
-    modoDivisao, segmentosEspecificados,
+    eixo, total,
+    numBarras, disponivel,
+    numVaos, modoDivisao, rotuloBarra,
 }) {
+    const descontoPerfil = DESCONTO_PERFIL;
+    const descontoPoli = DESCONTO_POLI;
+    const descontoBorda = DESCONTO_BORDA_DIM;
+    const larguraPinazio = LARGURA_PINAZIO;
     const steps = [
-        { op: '',  label: `${eixo} total`,            valor: total },
+        { op: '',  label: `Total`,            valor: total },
         { op: '−', label: 'Desconto perfil',          valor: descontoPerfil },
         { op: '−', label: 'Desconto poli',            valor: descontoPoli },
     ];
@@ -214,22 +207,13 @@ function criarBreakdownDimensao({
     }
     steps.push({ op: '−', label: 'Desconto borda',   valor: descontoBorda });
     steps.push({ op: '=', label: 'Espaço disponível', valor: disponivel, total: true });
+    if (numVaos > 0) {
+        steps.push({ op: '÷', label: `${numVaos} barra(s)`, valor: disponivel / numVaos });
+    }
 
-    const divisao = modoDivisao === 'especificada'
-        ? {
-            modo: 'Tamanhos especificados manualmente',
-            segmentos: segmentos.map((s, i) => ({
-                idx: i + 1,
-                especificado: parseFloat(segmentosEspecificados[i]) || 0,
-                real: s,
-            })),
-        }
-        : {
-            modo: numVaos > 0
-                ? `÷ ${numVaos} vão(s) iguais = ${(disponivel / numVaos).toFixed(2)}mm cada`
-                : '—',
-            segmentos: segmentos.map((s, i) => ({ idx: i + 1, real: s })),
-        };
+    const resultado = numVaos > 0 && modoDivisao !== 'especificada'
+        ? { label: rotuloBarra || 'Comprimento da barra', valor: disponivel / numVaos }
+        : null;
 
-    return { eixo, steps, divisao };
+    return { eixo, steps, resultado };
 }

@@ -22,13 +22,18 @@ export function renderResultados({
 }) {
     $('resultadoQuantidade').textContent = `Quantidade de peças: ${quantidade}`;
 
+    const temCategoria = [...(resultado.barrasVerticais || []), ...(resultado.barrasHorizontais || [])]
+        .some((b) => b.categoria);
+
     let html = `<h3 style="font-weight:600; margin-top:0.5rem; color: var(--primary-mid);">Resumo das barras:</h3>`;
-    html += `<table class="results-table"><thead><tr><th>Tipo</th><th>Medida (mm)</th><th>Qtd Total</th></tr></thead><tbody>`;
+    html += `<table class="results-table"><thead><tr><th>Tipo</th>${temCategoria ? '<th>Categoria</th>' : ''}<th>Medida (mm)</th><th>Qtd Total</th></tr></thead><tbody>`;
     resultado.barrasVerticais.forEach((b) => {
-        html += `<tr><td>Vertical</td><td>${b.medida}</td><td>${b.quantidade}</td></tr>`;
+        const cat = b.categoria ? `<td>${capitalize(b.categoria)}</td>` : '';
+        html += `<tr><td>Vertical</td>${temCategoria ? cat || '<td>—</td>' : ''}<td>${b.medida}</td><td>${b.quantidade}</td></tr>`;
     });
     resultado.barrasHorizontais.forEach((b) => {
-        html += `<tr><td>Horizontal</td><td>${b.medida}</td><td>${b.quantidade}</td></tr>`;
+        const cat = b.categoria ? `<td>${capitalize(b.categoria)}</td>` : '';
+        html += `<tr><td>Horizontal</td>${temCategoria ? cat || '<td>—</td>' : ''}<td>${b.medida}</td><td>${b.quantidade}</td></tr>`;
     });
     html += `</tbody></table>`;
 
@@ -43,6 +48,10 @@ export function renderResultados({
     html += renderBreakdownHTML(resultado.breakdown);
 
     $('resultado').innerHTML = html;
+}
+
+function capitalize(s) {
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 }
 
 function escapeHtml(s) {

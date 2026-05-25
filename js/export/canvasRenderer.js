@@ -17,7 +17,9 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
         larguraPinazio,
         realSegmentWidths, realSegmentHeights,
         specifySegmentsChecked, specifiedSegmentWidths, specifiedSegmentHeights,
+        modelo, direcaoInteira,
     } = params;
+    const isNovo = modelo === 'novo';
 
     const maxDim = 500;
     const cotaTotal = 36;
@@ -37,13 +39,16 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
     const hasSegV = numVaosVerticais > 1;
 
     // ── Painel Resultados ──────────────────────────────────────────────
-    const panelW = 260;
+    const panelW = 320;
     const panelPad = 14;
     const lineH = 22;
     const titleH = 28;
     const barras = (resumo.barrasVerticais || []).concat(resumo.barrasHorizontais || []);
     const panelLines = [];
     panelLines.push({ type: 'title', text: 'Resultados' });
+    if (resumo.tipoLabel) {
+        panelLines.push({ type: 'label', text: `Tipo: ${resumo.tipoLabel}` });
+    }
     panelLines.push({ type: 'label', text: `Quantidade: ${resumo.quantidade || 1} peça(s)` });
     if (barras.length > 0) {
         panelLines.push({ type: 'section', text: 'Barras:' });
@@ -122,62 +127,87 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
         cTSD += visH[i] + (i < numBarrasHorizontais ? scaledLP : 0);
     }
 
-    // Barras verticais
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#889ca4';
     ctx.lineWidth = 0.5;
-    if (numBarrasVerticais > 0) {
-        let bL = 0;
-        for (let j = 0; j < numBarrasVerticais; j++) {
-            bL += visW[j];
+
+    if (isNovo && direcaoInteira === 'vertical') {
+        // Pinázio Novo: horizontais (conectadas) primeiro, depois verticais inteiras por cima.
+        if (numBarrasHorizontais > 0) {
             let bT = 0;
-            for (let i = 0; i < numVaosVerticais; i++) {
-                if (visH[i] > 0 && scaledLP > 0) {
-                    ctx.fillRect(ox + bL, oy + bT, scaledLP, visH[i]);
-                    ctx.strokeRect(ox + bL, oy + bT, scaledLP, visH[i]);
+            for (let i = 0; i < numBarrasHorizontais; i++) {
+                bT += visH[i];
+                let bL = 0;
+                for (let j = 0; j < numVaosHorizontais; j++) {
+                    if (visW[j] > 0 && scaledLP > 0) {
+                        ctx.fillRect(ox + bL, oy + bT, visW[j], scaledLP);
+                        ctx.strokeRect(ox + bL, oy + bT, visW[j], scaledLP);
+                    }
+                    bL += visW[j] + (j < numBarrasVerticais ? scaledLP : 0);
                 }
-                bT += visH[i] + (i < numBarrasHorizontais ? scaledLP : 0);
+                bT += scaledLP;
             }
-            bL += scaledLP;
         }
-    }
-
-    // Barras horizontais
-    if (numBarrasHorizontais > 0) {
-        let bT = 0;
-        for (let i = 0; i < numBarrasHorizontais; i++) {
-            bT += visH[i];
+        if (numBarrasVerticais > 0) {
             let bL = 0;
-            for (let j = 0; j < numVaosHorizontais; j++) {
-                if (visW[j] > 0 && scaledLP > 0) {
-                    ctx.fillRect(ox + bL, oy + bT, visW[j], scaledLP);
-                    ctx.strokeRect(ox + bL, oy + bT, visW[j], scaledLP);
-                }
-                bL += visW[j] + (j < numBarrasVerticais ? scaledLP : 0);
+            for (let j = 0; j < numBarrasVerticais; j++) {
+                bL += visW[j];
+                ctx.fillRect(ox + bL, oy, scaledLP, scaledH);
+                ctx.strokeRect(ox + bL, oy, scaledLP, scaledH);
+                bL += scaledLP;
             }
-            bT += scaledLP;
         }
-    }
-
-    // Conectores
-    if (numBarrasVerticais > 0 && numBarrasHorizontais > 0 && scaledLP > 0) {
-        ctx.strokeStyle = '#889ca4';
-        ctx.lineWidth = 1;
-        let cL = 0;
-        for (let i = 0; i < numBarrasVerticais; i++) {
-            cL += visW[i];
-            let cT = 0;
-            for (let j = 0; j < numBarrasHorizontais; j++) {
-                cT += visH[j];
-                ctx.beginPath();
-                ctx.moveTo(ox + cL, oy + cT);
-                ctx.lineTo(ox + cL + scaledLP, oy + cT + scaledLP);
-                ctx.moveTo(ox + cL + scaledLP, oy + cT);
-                ctx.lineTo(ox + cL, oy + cT + scaledLP);
-                ctx.stroke();
-                cT += scaledLP;
+    } else {
+        // Pinázio Antigo — barras segmentadas + conectores X.
+        if (numBarrasVerticais > 0) {
+            let bL = 0;
+            for (let j = 0; j < numBarrasVerticais; j++) {
+                bL += visW[j];
+                let bT = 0;
+                for (let i = 0; i < numVaosVerticais; i++) {
+                    if (visH[i] > 0 && scaledLP > 0) {
+                        ctx.fillRect(ox + bL, oy + bT, scaledLP, visH[i]);
+                        ctx.strokeRect(ox + bL, oy + bT, scaledLP, visH[i]);
+                    }
+                    bT += visH[i] + (i < numBarrasHorizontais ? scaledLP : 0);
+                }
+                bL += scaledLP;
             }
-            cL += scaledLP;
+        }
+        if (numBarrasHorizontais > 0) {
+            let bT = 0;
+            for (let i = 0; i < numBarrasHorizontais; i++) {
+                bT += visH[i];
+                let bL = 0;
+                for (let j = 0; j < numVaosHorizontais; j++) {
+                    if (visW[j] > 0 && scaledLP > 0) {
+                        ctx.fillRect(ox + bL, oy + bT, visW[j], scaledLP);
+                        ctx.strokeRect(ox + bL, oy + bT, visW[j], scaledLP);
+                    }
+                    bL += visW[j] + (j < numBarrasVerticais ? scaledLP : 0);
+                }
+                bT += scaledLP;
+            }
+        }
+        if (numBarrasVerticais > 0 && numBarrasHorizontais > 0 && scaledLP > 0) {
+            ctx.strokeStyle = '#889ca4';
+            ctx.lineWidth = 1;
+            let cL = 0;
+            for (let i = 0; i < numBarrasVerticais; i++) {
+                cL += visW[i];
+                let cT = 0;
+                for (let j = 0; j < numBarrasHorizontais; j++) {
+                    cT += visH[j];
+                    ctx.beginPath();
+                    ctx.moveTo(ox + cL, oy + cT);
+                    ctx.lineTo(ox + cL + scaledLP, oy + cT + scaledLP);
+                    ctx.moveTo(ox + cL + scaledLP, oy + cT);
+                    ctx.lineTo(ox + cL, oy + cT + scaledLP);
+                    ctx.stroke();
+                    cT += scaledLP;
+                }
+                cL += scaledLP;
+            }
         }
     }
 
@@ -196,6 +226,7 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
     ctx.fillText(fmtNum(alturaTotal), 0, 0);
     ctx.restore();
 
+    // Cotas dos vãos (valor nominal — largura/numVaos — para dar uma noção simétrica)
     if (hasSegH) {
         ctx.font = '12px sans-serif'; ctx.fillStyle = lc;
         ctx.textAlign = 'center'; ctx.textBaseline = 'top';
@@ -240,7 +271,7 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
     ctx.stroke();
 
     let curY = py + panelPad;
-    const colWs = [80, 110, 50];
+    const colWs = [155, 105, 40];
     panelLines.forEach((line) => {
         const textX = px + panelPad;
         switch (line.type) {

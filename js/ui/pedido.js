@@ -5,6 +5,16 @@
 import { $ } from '../utils/dom.js';
 import { state } from '../state.js';
 import { desenharMiniPreview, limparPreview } from './preview.js';
+import { getCalculator } from '../calculators/index.js';
+
+function labelDoTipo(tipoId) {
+    if (!tipoId) return '';
+    try {
+        return getCalculator(tipoId).label;
+    } catch (_) {
+        return tipoId;
+    }
+}
 
 /**
  * Adiciona a última peça calculada ao pedido. Retorna { ok, mensagem }.
@@ -41,8 +51,8 @@ export function adicionarPecaAoPedido() {
         obs: summary.obs || '',
         tipoCalculadora: summary.tipoCalculadora,
         resumoBarras: [
-            ...summary.barrasVerticais.map((b) => ({ ...b, tipo: 'Vertical' })),
-            ...summary.barrasHorizontais.map((b) => ({ ...b, tipo: 'Horizontal' })),
+            ...summary.barrasVerticais.map((b) => ({ medida: b.medida, quantidade: b.quantidade, tipo: 'Vertical', categoria: b.categoria || null })),
+            ...summary.barrasHorizontais.map((b) => ({ medida: b.medida, quantidade: b.quantidade, tipo: 'Horizontal', categoria: b.categoria || null })),
         ],
         conectores: summary.conectores,
         cores,
@@ -104,16 +114,22 @@ export function updatePedidoPecasList() {
         const details = document.createElement('div');
         details.classList.add('peca-item-details');
 
+        const tipoLabel = labelDoTipo(peca.tipoCalculadora);
         let html =
             `<h4>Ambiente: ${escapeHtml(peca.ambiente)}</h4>` +
+            (tipoLabel ? `<p class="peca-tipo">${escapeHtml(tipoLabel)}</p>` : '') +
             `<p class="peca-dims">(${peca.dimensoes.quantidade}x ${peca.dimensoes.largura}mm x ${peca.dimensoes.altura}mm` +
             `${peca.dimensoes.especificarSegmentos ? ', Seg. Espec.' : ''})</p>`;
 
         if (peca.resumoBarras.length > 0) {
+            const temCategoria = peca.resumoBarras.some((b) => b.categoria);
             html += `<h5 style="font-weight:600; font-size:0.8rem; color: var(--primary-mid); margin-top:0.5rem;">Barras:</h5>`;
-            html += `<table class="results-table"><thead><tr><th>Tipo</th><th>Medida (mm)</th><th>Qtd Total</th></tr></thead><tbody>`;
+            html += `<table class="results-table"><thead><tr><th>Tipo</th>${temCategoria ? '<th>Categoria</th>' : ''}<th>Medida (mm)</th><th>Qtd Total</th></tr></thead><tbody>`;
             peca.resumoBarras.forEach((b) => {
-                html += `<tr><td>${escapeHtml(b.tipo)}</td><td>${escapeHtml(b.medida)}</td><td>${b.quantidade}</td></tr>`;
+                const catCell = temCategoria
+                    ? `<td>${b.categoria ? escapeHtml(b.categoria.charAt(0).toUpperCase() + b.categoria.slice(1)) : '—'}</td>`
+                    : '';
+                html += `<tr><td>${escapeHtml(b.tipo)}</td>${catCell}<td>${escapeHtml(b.medida)}</td><td>${b.quantidade}</td></tr>`;
             });
             html += `</tbody></table>`;
         } else {
@@ -122,6 +138,8 @@ export function updatePedidoPecasList() {
 
         if (peca.conectores > 0) {
             html += `<p style="font-size:0.85rem; margin-top:0.5rem;">Conectores: ${peca.conectores} unidades</p>`;
+        } else {
+            html += `<p style="font-size:0.75rem; margin-top:0.5rem; color: var(--text-muted);">Sem conectores.</p>`;
         }
 
         const corCam = peca.cores?.camaraNome || 'PRATA';

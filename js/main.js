@@ -74,6 +74,9 @@ function calcular() {
             specifySegmentsChecked: input.specifySegmentsChecked,
             specifiedSegmentWidths: [...input.specifiedSegmentWidths],
             specifiedSegmentHeights: [...input.specifiedSegmentHeights],
+            // Modelo do pinázio — afeta o render (inteiras vs conectadas, com/sem conectores X).
+            modelo: input.tipoCalculadora,                  // 'antigo' | 'novo'
+            direcaoInteira: resultado.direcaoInteira || null, // 'vertical' (novo) ou null (antigo)
         },
     };
 

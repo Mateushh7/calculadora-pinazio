@@ -11,6 +11,13 @@
 import { $ } from '../utils/dom.js';
 import { state } from '../state.js';
 import { gerarCanvasPeca } from './canvasRenderer.js';
+import { getCalculator } from '../calculators/index.js';
+
+function labelDoTipo(tipoId) {
+    if (!tipoId) return '';
+    try { return getCalculator(tipoId).label; }
+    catch (_) { return tipoId; }
+}
 
 /**
  * Baixa a imagem PNG da peça atualmente calculada (preview + painel resultados).
@@ -29,8 +36,15 @@ export function handleDownloadImage() {
 
     const resumo = {
         quantidade: parseInt($('quantidade').value) || 1,
-        barrasVerticais: (summary.barrasVerticais || []).map((b) => ({ tipo: 'Vertical', medida: b.medida, quantidade: b.quantidade })),
-        barrasHorizontais: (summary.barrasHorizontais || []).map((b) => ({ tipo: 'Horizontal', medida: b.medida, quantidade: b.quantidade })),
+        tipoLabel: labelDoTipo(summary.tipoCalculadora),
+        barrasVerticais: (summary.barrasVerticais || []).map((b) => ({
+            tipo: b.categoria ? `Vertical (${b.categoria})` : 'Vertical',
+            medida: b.medida, quantidade: b.quantidade,
+        })),
+        barrasHorizontais: (summary.barrasHorizontais || []).map((b) => ({
+            tipo: b.categoria ? `Horizontal (${b.categoria})` : 'Horizontal',
+            medida: b.medida, quantidade: b.quantidade,
+        })),
         conectores: summary.conectores || 0,
         obs: summary.obs || '',
     };
@@ -131,13 +145,20 @@ export async function handleDownloadPDF() {
 function resumoDoPeca(peca) {
     const verticais = (peca.resumoBarras || [])
         .filter((b) => b.tipo === 'Vertical')
-        .map((b) => ({ tipo: 'Vertical', medida: b.medida, quantidade: b.quantidade }));
+        .map((b) => ({
+            tipo: b.categoria ? `Vertical (${b.categoria})` : 'Vertical',
+            medida: b.medida, quantidade: b.quantidade,
+        }));
     const horizontais = (peca.resumoBarras || [])
         .filter((b) => b.tipo === 'Horizontal')
-        .map((b) => ({ tipo: 'Horizontal', medida: b.medida, quantidade: b.quantidade }));
+        .map((b) => ({
+            tipo: b.categoria ? `Horizontal (${b.categoria})` : 'Horizontal',
+            medida: b.medida, quantidade: b.quantidade,
+        }));
 
     return {
         quantidade: peca.dimensoes?.quantidade || 1,
+        tipoLabel: labelDoTipo(peca.tipoCalculadora),
         barrasVerticais: verticais,
         barrasHorizontais: horizontais,
         conectores: peca.conectores || 0,

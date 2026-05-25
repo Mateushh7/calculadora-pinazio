@@ -20,7 +20,10 @@ export function renderBreakdownHTML(breakdown) {
             `<h3>Cálculo — ${escapeHtml(breakdown.calculadora)}</h3>` +
             renderDimensao(breakdown.largura) +
             renderDimensao(breakdown.altura) +
-            renderConectores(breakdown.conectores) +
+            (breakdown.conectores ? renderConectores(breakdown.conectores) : '') +
+            (breakdown.observacao
+                ? `<div class="breakdown-group"><div class="breakdown-row"><span class="label" style="font-style:italic;">${escapeHtml(breakdown.observacao)}</span></div></div>`
+                : '') +
         `</div>`
     );
 }
@@ -38,20 +41,20 @@ function renderDimensao(dim) {
         );
     }).join('');
 
-    const segs = (dim.divisao?.segmentos || [])
-        .map((s) => `Vão ${s.idx}: <strong>${fmt2(s.real)} mm</strong>${
-            s.especificado !== undefined ? ` (especificado ${fmt2(s.especificado)})` : ''
-        }`)
-        .join(' &nbsp;·&nbsp; ');
+    // Resultado final do cálculo (comprimento da barra). Não listamos vãos —
+    // só interessa o tamanho da barra que sai desse cálculo.
+    const resultado = dim.resultado
+        ? `<div class="breakdown-row total"><span class="op">→</span>` +
+              `<span class="label">${escapeHtml(dim.resultado.label)}</span>` +
+              `<span class="value">${fmt2(dim.resultado.valor)} mm</span>` +
+          `</div>`
+        : '';
 
     return (
         `<div class="breakdown-group">` +
             `<h4>${escapeHtml(dim.eixo)}</h4>` +
             linhas +
-            (dim.divisao
-                ? `<div class="breakdown-row"><span class="label">${escapeHtml(dim.divisao.modo)}</span></div>` +
-                  (segs ? `<div class="breakdown-row"><span class="label">${segs}</span></div>` : '')
-                : '') +
+            resultado +
         `</div>`
     );
 }
