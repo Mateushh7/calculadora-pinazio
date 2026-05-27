@@ -418,6 +418,24 @@ input[type=number]::-webkit-outer-spin-button {
     color: #b45309;
 }
 
+/* ── DIAGRAMA DE FUROS (Pinázio Novo) ── */
+.furos-diagram {
+    background: #f7fbfc;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.furos-diagram h4 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary-mid);
+    margin-bottom: 0.5rem;
+}
+
 /* ── EMPTY STATE ── */
 .empty-state {
     text-align: center;

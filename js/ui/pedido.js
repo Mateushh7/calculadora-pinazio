@@ -5,6 +5,7 @@
 import { $ } from '../utils/dom.js';
 import { state } from '../state.js';
 import { desenharMiniPreview, limparPreview } from './preview.js';
+import { renderFurosDiagramHTML } from './furosDiagram.js';
 import { getCalculator } from '../calculators/index.js';
 
 function labelDoTipo(tipoId) {
@@ -50,6 +51,7 @@ export function adicionarPecaAoPedido() {
         ambiente: ambienteNome,
         obs: summary.obs || '',
         tipoCalculadora: summary.tipoCalculadora,
+        furos: summary.furos || null,
         resumoBarras: [
             ...summary.barrasVerticais.map((b) => ({ medida: b.medida, quantidade: b.quantidade, tipo: 'Vertical', categoria: b.categoria || null })),
             ...summary.barrasHorizontais.map((b) => ({ medida: b.medida, quantidade: b.quantidade, tipo: 'Horizontal', categoria: b.categoria || null })),
@@ -162,6 +164,14 @@ export function updatePedidoPecasList() {
 
         item.appendChild(details);
         item.appendChild(miniPreview);
+
+        // Diagrama de furos (Pinázio Novo) — à direita da peça
+        if (peca.furos) {
+            const furosWrap = document.createElement('div');
+            furosWrap.classList.add('pedido-furos-side');
+            furosWrap.innerHTML = renderFurosDiagramHTML(peca.furos);
+            item.appendChild(furosWrap);
+        }
 
         const deleteBtn = document.createElement('button');
         deleteBtn.classList.add('delete-button');

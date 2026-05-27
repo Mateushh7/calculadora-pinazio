@@ -47,6 +47,7 @@ export function handleDownloadImage() {
         })),
         conectores: summary.conectores || 0,
         obs: summary.obs || '',
+        furos: summary.furos || null,
     };
 
     const canvas = gerarCanvasPeca(summary.previewParams, resumo, summary.ambiente || ambienteNome, corCamara, corPinazio);
@@ -163,5 +164,6 @@ function resumoDoPeca(peca) {
         barrasHorizontais: horizontais,
         conectores: peca.conectores || 0,
         obs: peca.obs || '',
+        furos: peca.furos || null,
     };
 }

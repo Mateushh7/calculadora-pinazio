@@ -170,6 +170,26 @@ export const pinazioNovo = {
             }
         }
 
+        // ── Furos nas barras inteiras ──────────────────────────────────
+        // Cada conectada horizontal atravessa as inteiras verticais e cria
+        // um furo no centro da conectada (a 18/2 = 9 mm do topo da conectada).
+        // Como todas as inteiras são idênticas, basta uma lista de posições.
+        let furos = null;
+        if (numBarrasVerticais > 0 && numBarrasHorizontais > 0) {
+            const posicoes = [];
+            let y = 0;
+            for (let i = 0; i < numBarrasHorizontais; i++) {
+                y += realSegmentHeights[i];               // topo da conectada
+                posicoes.push(y + LARGURA_PINAZIO / 2);   // centro da conectada
+                y += LARGURA_PINAZIO;
+            }
+            furos = {
+                comprimentoBarra: alturaUtil,
+                quantidadeBarrasIguais: numBarrasVerticais,
+                posicoes,
+            };
+        }
+
         // ── Breakdown ──────────────────────────────────────────────────
         const breakdown = {
             calculadora: this.label,
@@ -195,6 +215,7 @@ export const pinazioNovo = {
             realSegmentWidths,
             realSegmentHeights,
             direcaoInteira: 'vertical',
+            furos,
             breakdown,
         };
     },

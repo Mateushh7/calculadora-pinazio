@@ -12,6 +12,32 @@
     letter-spacing: 0.02em;
 }
 
+.preview-row {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.preview-row .preview {
+    flex: 1;
+}
+
+.preview-row #furosDiagramContainer {
+    flex-shrink: 0;
+    width: 180px;
+    min-width: 180px;
+    display: flex;
+    align-items: stretch;
+}
+
+.preview-row #furosDiagramContainer:empty {
+    display: none;
+}
+
+.preview-row #furosDiagramContainer > .furos-diagram {
+    width: 100%;
+}
+
 .preview {
     display: flex;
     justify-content: center;
@@ -239,6 +265,24 @@
     align-items: center;
     overflow: visible;
     margin-left: auto;
+}
+
+/* Quando o diagrama de furos está presente, o mini-preview NÃO empurra ele pra ponta */
+.pedido-peca-item:has(.pedido-furos-side) .mini-preview-container {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+/* Diagrama de furos do Pinázio Novo, posicionado à direita da peça */
+.pedido-furos-side {
+    flex-shrink: 0;
+    width: 170px;
+    display: flex;
+    align-items: stretch;
+}
+
+.pedido-furos-side > .furos-diagram {
+    width: 100%;
 }
 
 .mini-preview-container .peca {

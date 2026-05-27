@@ -69,10 +69,13 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
         panelLines.push({ type: 'obs', text: resumo.obs });
     }
 
+    // Altura extra para o diagrama de furos (quando aplicável).
+    const FUROS_DIAG_HEIGHT = resumo.furos ? 200 : 0;
+
     const panelContentH = panelLines.reduce(
         (a, l) => a + (l.type === 'title' ? titleH : lineH),
         panelPad * 2,
-    );
+    ) + FUROS_DIAG_HEIGHT;
 
     const marginLeft = cotaTotal + (hasSegV ? 36 : 10);
     const marginTop = cotaTotal + 16;
@@ -335,5 +338,78 @@ export function gerarCanvasPeca(params, resumo, ambienteNome, corCamaraNome, cor
         }
     });
 
+    // ── Diagrama de furos (Pinázio Novo) ───────────────────────────────
+    if (resumo.furos) {
+        desenharFurosNoCanvas(ctx, px + panelPad, curY + 6, panelW - panelPad * 2, FUROS_DIAG_HEIGHT - 6, resumo.furos);
+    }
+
     return canvas;
+}
+
+/**
+ * Desenha o diagrama de furos (barra inteira vertical com marcadores e cotas)
+ * dentro do retângulo (x, y, w, h) no canvas.
+ */
+function desenharFurosNoCanvas(ctx, x, y, w, h, furos) {
+    const { comprimentoBarra, posicoes, quantidadeBarrasIguais } = furos;
+
+    // Título
+    const titulo = quantidadeBarrasIguais > 1
+        ? `Furos nas ${quantidadeBarrasIguais} inteiras (todas iguais)`
+        : 'Furos na barra inteira';
+    ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = '#3a5a6b';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText(titulo, x, y);
+
+    const barW = 22;
+    const barX = x + 6;
+    const barTop = y + 22;
+    const barBottom = y + h - 14;
+    const barH = Math.max(60, barBottom - barTop);
+
+    // Barra
+    ctx.fillStyle = '#e8f5f7';
+    ctx.fillRect(barX, barTop, barW, barH);
+    ctx.strokeStyle = '#2C6E7A'; ctx.lineWidth = 1;
+    ctx.strokeRect(barX, barTop, barW, barH);
+
+    // Linha central (tracejada)
+    const cx = barX + barW / 2;
+    ctx.save();
+    ctx.setLineDash([2, 2]);
+    ctx.strokeStyle = '#9ecdd4'; ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(cx, barTop); ctx.lineTo(cx, barTop + barH);
+    ctx.stroke();
+    ctx.restore();
+
+    // "topo"
+    ctx.font = '9px sans-serif'; ctx.fillStyle = '#4a7a87';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText('topo', cx, barTop - 2);
+
+    // Comprimento total
+    ctx.textBaseline = 'top';
+    ctx.fillText(`${comprimentoBarra.toFixed(2)} mm`, cx, barTop + barH + 3);
+
+    // Furos
+    posicoes.forEach((mm) => {
+        const fy = barTop + (mm / comprimentoBarra) * barH;
+        ctx.fillStyle = '#C63832';
+        ctx.beginPath();
+        ctx.arc(cx, fy, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#7a201d'; ctx.lineWidth = 0.6;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#163A4A'; ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(barX + barW, fy);
+        ctx.lineTo(barX + barW + 6, fy);
+        ctx.stroke();
+
+        ctx.font = 'bold 10px sans-serif'; ctx.fillStyle = '#163A4A';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(`${mm.toFixed(2)} mm`, barX + barW + 8, fy);
+    });
 }

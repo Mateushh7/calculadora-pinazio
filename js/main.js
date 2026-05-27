@@ -13,6 +13,7 @@ import { showError, renderResultados } from './ui/results.js';
 import { limparPreview, desenharPreview } from './ui/preview.js';
 import { generateDynamicSegmentInputs, updateSegmentInputWarning } from './ui/segmentInputs.js';
 import { adicionarPecaAoPedido, updatePedidoPecasList } from './ui/pedido.js';
+import { renderFurosDiagramHTML } from './ui/furosDiagram.js';
 import { handleDownloadImage, handleDownloadPDF } from './export/download.js';
 
 /**
@@ -30,6 +31,7 @@ function calcular() {
         $('downloadImageButton').style.display = 'none';
         $('captureContainer').style.display = 'none';
         $('resultadoQuantidade').textContent = '';
+        $('furosDiagramContainer').innerHTML = '';
         state.lastCalculatedPieceSummary = null;
         return;
     }
@@ -45,6 +47,7 @@ function calcular() {
         $('downloadImageButton').style.display = 'none';
         $('captureContainer').style.display = 'none';
         $('resultadoQuantidade').textContent = '';
+        $('furosDiagramContainer').innerHTML = '';
         state.lastCalculatedPieceSummary = null;
         return;
     }
@@ -61,6 +64,7 @@ function calcular() {
         conectores: resultado.conectores,
         cores: { camaraNome: input.corCamaraNome, pinazioNome: input.corPinazioNome },
         breakdown: resultado.breakdown,
+        furos: resultado.furos || null,
         previewParams: {
             larguraTotal: input.largura,
             alturaTotal: input.altura,
@@ -89,6 +93,7 @@ function calcular() {
 
     $('previewTitleAmbiente').textContent = `Ambiente: ${input.ambienteNome}`;
     desenharPreview(state.lastCalculatedPieceSummary.previewParams);
+    $('furosDiagramContainer').innerHTML = renderFurosDiagramHTML(resultado.furos);
 
     const coresInfoEl = $('previewCoresInfo');
     coresInfoEl.innerHTML =
