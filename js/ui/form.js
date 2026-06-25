@@ -34,6 +34,13 @@ export function lerFormulario() {
         };
     }
 
+    if (!$('corCamara').value || !$('corPinazio').value) {
+        return {
+            ok: false,
+            erro: 'Por favor, selecione as cores da câmara e do pinázio.',
+        };
+    }
+
     if (invalidoBase) {
         return {
             ok: false,
