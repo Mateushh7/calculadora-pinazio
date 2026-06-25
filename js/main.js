@@ -111,11 +111,18 @@ function calcular() {
 function popularSelectTipos() {
     const select = $('tipoCalculadora');
     select.innerHTML = '';
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Selecione...';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
     listCalculators().forEach((c) => {
         const opt = document.createElement('option');
         opt.value = c.id;
         opt.textContent = c.label;
-        if (c.id === DEFAULT_CALCULATOR_ID) opt.selected = true;
         select.appendChild(opt);
     });
 }

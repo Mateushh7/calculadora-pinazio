@@ -27,6 +27,13 @@ export function lerFormulario() {
         quantidade < 1 || largura <= 0 || altura <= 0 ||
         numVaosHorizontais < 1 || numVaosVerticais < 1;
 
+    if (!$('tipoCalculadora').value) {
+        return {
+            ok: false,
+            erro: 'Por favor, selecione o tipo de pinázio.',
+        };
+    }
+
     if (invalidoBase) {
         return {
             ok: false,
